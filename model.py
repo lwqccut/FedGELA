@@ -428,7 +428,9 @@ class model_cifar(nn.Module):
 
     def forward(self, x):
         h = self.backbone(x)
-        h=h.squeeze()
+        # Preserve the batch dimension when a client/test loader has one
+        # sample (``squeeze`` produced a 1-D tensor and broke BatchNorm).
+        h = torch.flatten(h, 1)
         x=h
         x=self.encoder(x)
         y = self.proxy(x)

@@ -12,6 +12,12 @@ from utils import *
 import json
 import time
 
+# The reference implementation assumes CUDA. Keep it runnable on CPU-only
+# cloud instances while preserving CUDA behavior when available.
+if not torch.cuda.is_available():
+    torch.Tensor.cuda = lambda self, device=None, non_blocking=False: self
+    torch.nn.Module.cuda = lambda self, device=None: self
+
 def produce_Ew(train_ds_local_set,num_classes):
     Ew_set=[]
     Mask_set=[]
@@ -169,6 +175,9 @@ def get_args():
     parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
     parser.add_argument('--reg', type=float, default=1e-4, help="L2 regularization strength")
     args = parser.parse_args()
+    # Kept for compatibility with the training call; the optimizer is created
+    # inside ``train_net`` from the supplied learning-rate options.
+    args.optimizer = None
     return args
 
 def train_net(net_id, net,train_dataloader, test_dataloader, epochs, lr, optimizer,reg,temperature):
@@ -308,9 +317,9 @@ if __name__ == '__main__':
     global EW_set
     global MASK_set
     if args.dataset=="cifar10":
-        ETF=get_etf(84,n_class).cuda()
+        ETF=get_etf(512,n_class).cuda()
     if args.dataset=="SVHN":
-        ETF=get_etf(84,n_class).cuda()
+        ETF=get_etf(512,n_class).cuda()
     if args.dataset=="fmnist":
         ETF=get_etf(84,n_class).cuda()
     elif args.dataset=="cifar100":
