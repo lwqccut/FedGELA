@@ -29,7 +29,7 @@ def produce_Ew(train_ds_local_set,num_classes):
             indices=train_ds_local_set[net_id].indices
             targets=np.array(ds.targets)[indices]
         except:
-            targets=train_ds.targets
+            targets = getattr(train_ds, "targets", getattr(train_ds, "target"))
         
         label=torch.tensor(targets)
         label.requires_grad = False
@@ -321,6 +321,8 @@ if __name__ == '__main__':
     if args.dataset=="SVHN":
         ETF=get_etf(512,n_class).cuda()
     if args.dataset=="fmnist":
+        ETF=get_etf(84,n_class).cuda()
+    elif args.dataset=="mnist":
         ETF=get_etf(84,n_class).cuda()
     elif args.dataset=="cifar100":
         ETF=get_etf(512,n_class).cuda()

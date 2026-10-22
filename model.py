@@ -410,6 +410,8 @@ class model_cifar(nn.Module):
             out_dim=512
         if args.dataset=="fmnist":
             out_dim=84
+        elif args.dataset=="mnist":
+            out_dim=84
         elif args.dataset=="cifar100":
             #out_dim=84
             out_dim=512

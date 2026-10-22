@@ -117,8 +117,9 @@ def get_dataloader_per(args, dataidxs_train=None,dataidxs_test=None,identity=Non
         transform_test = transforms.Compose([
             transforms.ToTensor(),
             ])
-        train_ds = MNIST_truncated(dataidxs=dataidxs, train=True, transform=transform_train)
-        test_ds = MNIST_truncated(train=False, transform=transform_test)
+        train_ds = MNIST_truncated(dataidxs=dataidxs_train, train=True, transform=transform_train)
+        test_ds = MNIST_truncated(dataidxs=dataidxs_test, train=False, transform=transform_test)
+        test_global_ds = MNIST_truncated(dataidxs=None, train=False, transform=transform_test)
     elif args.dataset=="fmnist":
 
         transform_train = transforms.Compose([
