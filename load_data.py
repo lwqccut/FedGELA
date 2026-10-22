@@ -111,10 +111,12 @@ def get_dataloader_per(args, dataidxs_train=None,dataidxs_test=None,identity=Non
     elif args.dataset=="mnist":
 
         transform_train = transforms.Compose([
+            transforms.Resize((32, 32)),
             transforms.ToTensor(),
             ])
 
         transform_test = transforms.Compose([
+            transforms.Resize((32, 32)),
             transforms.ToTensor(),
             ])
         train_ds = MNIST_truncated(dataidxs=dataidxs_train, train=True, transform=transform_train)
@@ -171,7 +173,7 @@ def get_dataloader_per(args, dataidxs_train=None,dataidxs_test=None,identity=Non
         test_ds = tinyimagenet_s3(train=False, transform=transform_test)
     
     print("finishing init dataloader")
-    train_dl = DataLoader(dataset=train_ds, batch_size=args.train_batchsize, drop_last=True, shuffle=True,num_workers=4)
-    test_dl = DataLoader(dataset=test_ds, batch_size=args.test_batchsize, shuffle=False, drop_last=False,num_workers=4)
-    test_global=DataLoader(dataset=test_global_ds, batch_size=args.test_batchsize, shuffle=False, drop_last=False,num_workers=4)
+    train_dl = DataLoader(dataset=train_ds, batch_size=args.train_batchsize, drop_last=True, shuffle=True,num_workers=0)
+    test_dl = DataLoader(dataset=test_ds, batch_size=args.test_batchsize, shuffle=False, drop_last=False,num_workers=0)
+    test_global=DataLoader(dataset=test_global_ds, batch_size=args.test_batchsize, shuffle=False, drop_last=False,num_workers=0)
     return train_dl, test_dl, train_ds, test_ds,test_global

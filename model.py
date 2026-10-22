@@ -327,9 +327,9 @@ class proxies(nn.Module):
     def forward(self,feature):
         return self.proxy(feature)
 class SimpleCNN_header(nn.Module):
-    def __init__(self, input_dim, hidden_dims, output_dim=10):
+    def __init__(self, input_dim, hidden_dims, output_dim=10, in_channels=3):
         super(SimpleCNN_header, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.conv1 = nn.Conv2d(in_channels, 6, 5)
         self.relu = nn.ReLU()
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
@@ -375,7 +375,8 @@ class model_cifar(nn.Module):
             num_ftrs = basemodel.fc.in_features
             #num_ftrs = 84
         elif args.model == 'simple-cnn':
-            self.backbone = SimpleCNN_header(input_dim=(16 * 5 * 5), hidden_dims=[120, 84])
+            channels = 1 if args.dataset == "mnist" else 3
+            self.backbone = SimpleCNN_header(input_dim=(16 * 5 * 5), hidden_dims=[120, 84], in_channels=channels)
             num_ftrs = 84
         elif args.model=="efficient":
             #self.backbone=EfficientNet.from_pretrained('efficientnet-b0')
