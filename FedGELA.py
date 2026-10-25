@@ -29,7 +29,9 @@ def produce_Ew(train_ds_local_set,num_classes):
             indices=train_ds_local_set[net_id].indices
             targets=np.array(ds.targets)[indices]
         except:
-            targets = getattr(train_ds, "targets", getattr(train_ds, "target"))
+            targets = getattr(train_ds, "targets", None)
+            if targets is None:
+                targets = getattr(train_ds, "target")
         
         label=torch.tensor(targets)
         label.requires_grad = False

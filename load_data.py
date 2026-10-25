@@ -125,11 +125,13 @@ def get_dataloader_per(args, dataidxs_train=None,dataidxs_test=None,identity=Non
     elif args.dataset=="fmnist":
 
         transform_train = transforms.Compose([
+            transforms.Resize((32, 32)),
             transforms.ToTensor(),
 
             ])
 
         transform_test = transforms.Compose([
+            transforms.Resize((32, 32)),
             transforms.ToTensor(),
 
             ])

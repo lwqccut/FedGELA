@@ -375,7 +375,7 @@ class model_cifar(nn.Module):
             num_ftrs = basemodel.fc.in_features
             #num_ftrs = 84
         elif args.model == 'simple-cnn':
-            channels = 1 if args.dataset == "mnist" else 3
+            channels = 1 if args.dataset in ("mnist", "fmnist") else 3
             self.backbone = SimpleCNN_header(input_dim=(16 * 5 * 5), hidden_dims=[120, 84], in_channels=channels)
             num_ftrs = 84
         elif args.model=="efficient":
