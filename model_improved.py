@@ -24,7 +24,6 @@ class model_cifar(_BaseModel):
             nn.init.zeros_(self.adapter[-1].bias)
         if self.use_etf_improved:
             self.etf_scale = nn.Parameter(torch.tensor(1.0))
-            self.etf_bias = nn.Parameter(torch.zeros(n_classes))
 
     def forward(self, x):
         h = self.backbone(x)
@@ -34,5 +33,7 @@ class model_cifar(_BaseModel):
             features = features + self.adapter(features)
         output = self.proxy(features)
         if self.use_etf_improved:
-            output = self.etf_scale.clamp_min(0.05) * output + self.etf_bias
+            # ETF is applied to the feature proxy later in the original loss
+            # (``output @ ETF``), so calibrate its feature magnitude here.
+            output = self.etf_scale.clamp_min(0.05) * output
         return h, features, output
