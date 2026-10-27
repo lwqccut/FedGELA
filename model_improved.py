@@ -18,10 +18,11 @@ class model_cifar(_BaseModel):
         if self.use_adapter:
             hidden = max(16, dim // 4)
             self.adapter = nn.Sequential(
-                nn.Linear(dim, hidden), nn.ReLU(), nn.Linear(hidden, dim)
+                nn.LayerNorm(dim), nn.Linear(dim, hidden), nn.ReLU(), nn.Linear(hidden, dim)
             )
             nn.init.zeros_(self.adapter[-1].weight)
             nn.init.zeros_(self.adapter[-1].bias)
+            self.adapter_gate = nn.Parameter(torch.tensor(0.0))
         if self.use_etf_improved:
             self.etf_scale = nn.Parameter(torch.tensor(1.0))
 
@@ -30,7 +31,7 @@ class model_cifar(_BaseModel):
         h = torch.flatten(h, 1)
         features = self.encoder(h)
         if self.use_adapter:
-            features = features + self.adapter(features)
+            features = features + self.adapter_gate.tanh() * self.adapter(features)
         output = self.proxy(features)
         if self.use_etf_improved:
             # ETF is applied to the feature proxy later in the original loss

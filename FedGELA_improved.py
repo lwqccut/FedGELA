@@ -378,7 +378,7 @@ if __name__ == '__main__':
 
         arr = np.arange(args.n_parties)
         np.random.shuffle(arr)
-        if args.use_curation:
+        if args.use_curation and round % 3 != 0:
             # Client-side curation: choose the strongest clients from a
             # shuffled candidate order, retaining stochastic tie-breaking.
             arr = list(arr)
@@ -402,6 +402,7 @@ if __name__ == '__main__':
             net_id=selected[idx]
             net_para = nets[net_id].cpu().state_dict()
             score = client_scores.get(int(net_id), 1.0) if args.use_curation else 1.0
+            score = min(1.25, max(0.75, score))
             weight = (weights[idx] * score) / sum(weights[j] * (client_scores.get(int(selected[j]), 1.0) if args.use_curation else 1.0) for j in range(len(selected)))
             if idx == 0:
                 for key in net_para:
