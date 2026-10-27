@@ -2,8 +2,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 common=(--dataset=fmnist --partition=dirichlet --n_parties=2 --party_per_round=1
-  --comm_round=80 --epochs=1 --train_batchsize=2048 --test_batchsize=1000
-  --model=simple-cnn --logdir=./log --modeldir=./models --proxy=etf
+  --comm_round=50 --epochs=1 --train_batchsize=128 --test_batchsize=256
+  --model=resnet20 --logdir=./log --modeldir=./models --proxy=etf
   --temperature=0.2 --beta=0.5)
 
 run_one() {

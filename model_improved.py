@@ -6,12 +6,36 @@ ETF scale/bias calibration and a small residual feature adapter.
 """
 import torch
 import torch.nn as nn
-from model import model_cifar as _BaseModel
+from model import model_cifar as _BaseModel, ResNet_s, BasicBlock
+
+
+class _ResNet20Features(nn.Module):
+    """CIFAR ResNet-20 trunk without its classifier."""
+    def __init__(self):
+        super().__init__()
+        net = ResNet_s(BasicBlock, [3, 3, 3], num_classes=10)
+        self.conv1, self.bn1 = net.conv1, net.bn1
+        self.layer1, self.layer2, self.layer3 = net.layer1, net.layer2, net.layer3
+
+    def forward(self, x):
+        x = torch.relu(self.bn1(self.conv1(x)))
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        return torch.flatten(torch.nn.functional.avg_pool2d(x, x.size()[3]), 1)
 
 
 class model_cifar(_BaseModel):
     def __init__(self, args, n_classes, out_dim=256):
+        requested_model = args.model
+        # Build the shared head, then replace only the backbone for ResNet-20.
+        if requested_model == "resnet20":
+            args.model = "simple-cnn"
         super().__init__(args, n_classes, out_dim=out_dim)
+        args.model = requested_model
+        if requested_model == "resnet20":
+            self.backbone = _ResNet20Features()
+            self.encoder = nn.Sequential(nn.Linear(64, 64), nn.ReLU(), nn.Linear(64, 512))
         self.use_etf_improved = bool(getattr(args, "use_etf_improved", False))
         self.use_adapter = bool(getattr(args, "use_adapter", False))
         dim = self.encoder[-1].out_features
